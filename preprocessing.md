@@ -215,6 +215,8 @@ qt = preprocessing.QuantileTransformer(output_distribution = 'normal', random_st
 
 ### 7. 类别特征编码
 
+LR,SVM类模型可以使用OneHotEncoder。决策树类模型可以使用LabelEncoder。
+
 #### 7.1 一般编码
 
 不改变特征维度，适用于同一特征下不同类别的值之间有距离、大小关系的情况，比如年龄、身高。
