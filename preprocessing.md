@@ -92,6 +92,11 @@ data['feature'] = data['feature'].fillna(data['feature'].median())  #中位数
 data['feature'] = data['feature'].fillna(data['feature'].mean())  #平均数
 ```
 
+- 其他处理方式：
+  - 聚类：对数据进行聚类，缺失值用同类内的均值或者中位数代替
+  - binning:  this involves first sorting the data into equidepth bins; then one can smooth the data by bin means, median, or max and min.
+  - smooth the data by fitting data into regression function.
+
 ### 3. 相关性
 
 ```python
@@ -260,6 +265,14 @@ df_grouped = df.groupby(['feature1', 'feature2'], as_index=False)
 df_grouped.mean()
 ```
 
+#### 9.2 降维
+
+PCA：主成分分析法只适用于数据空间维度小于样本量的情况，当数据空间维度很高时，将不再适用。
+
+#### 9.3 特征选择
+
+Lasso回归本身就有特征选择的作用。
+
 ### 10. 其他操作
 
 #### 10.1 类别分组
@@ -279,3 +292,94 @@ writer.save()
 writer.close()
 ```
 
+## 第一次更新
+
+### 1. pandas的索引
+
+1. `.loc()`  基于标签
+2. `.iloc()` 基于整数
+3. `.ix()` 基于标签和整数
+
+#### 1.1 `.loc()`
+
+需要两个单/列表/范围运算符，用","分隔。第一个表示行，第二个表示列
+
+```python
+df = pd.DataFrame(np.random.randn(8, 4),
+index = ['a','b','c','d','e','f','g','h'], columns = ['A', 'B', 'C', 'D'])
+print (df.loc[:,['A','C']])
+```
+
+```python
+# 举例
+strain = train[train.Sales>0]
+strain.loc[strain['Store']==1 ,['Date','Sales']].plot(x='Date',y='Sales',figsize=(16,4))
+```
+
+#### 1.2 `.iloc()`
+
+```python
+df = pd.DataFrame(np.random.randn(8, 4), columns = ['A', 'B', 'C', 'D'])
+print (df.iloc[1:5, 2:4])
+```
+
+### 2 pandas的groupby
+
+#### 2.1 分组
+
+```python
+# 得到groupby类型数据，利用size()查看
+ridership_user_week=ridership.groupby(["usertype","weekday"]).size() # .mean()
+```
+
+#### 2.2 获取
+
+```python
+ridership_user.get_group("Customer").head() # 多重索引(("Customer","3"))
+ridership_user.get_group("Customer").mean()
+```
+
+#### 2.3 操作apply
+
+```python
+def plus(df,n,m):
+    df['c'] = (df['a']+df['b']) * m
+    df['d'] = (df['a']+df['b']) * n
+    return df
+list1 = [[1,3],[7,8],[4,5]]
+df1 = pd.DataFrame(list1,columns=['a','b'])
+df1 = df1.apply(plus,axis=1,args=(2,3,))
+```
+
+### 3. pandas的merge
+
+```python
+left = pd.DataFrame({'key1': ['K0', 'K1'],'key2': ['K0', 'K1'],'A': ['A0', 'A1'], 'B': ['B0', 'B1']})
+right = pd.DataFrame({'key1': ['K0', 'K1'],'key2': ['K0', 'K1'],'C': ['C0', 'C1'],'D': ['D0', 'D1']})
+# 合并两列, 默认方法是how=inner, 只合并相同的部分, how的取值可以为['left', 'right', 'outer', 'inner']
+res = pd.merge(left, right, on = ['key1', 'key2'])
+```
+
+### 其他
+
+1. 按某一列特征的值对整个数据集排序  
+   `train = train.sort_values(['Date'],ascending = False)`
+
+2. 删除某列
+   `ho_train.drop(['Date','Customers'],axis=1,inplace =True)`
+
+3. DataFrame创建
+   `result = pd.DataFrame({"Id": test['Id'], 'Sales': np.expm1(test_probs)})`
+
+4. 将某列解析成时间
+   `train = pd.read_csv("data/train.csv",parse_dates=[2], low_memory=False)`
+
+5. 提取时间的细节
+
+   ```python
+   data['Year'] = data.Date.dt.year
+   data['Month'] = data.Date.dt.month
+   data['Day'] = data.Date.dt.day
+   data['DayOfWeek'] = data.Date.dt.dayofweek
+   data['WeekOfYear'] = data.Date.dt.weekofyear
+   ```
