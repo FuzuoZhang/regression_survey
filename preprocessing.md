@@ -385,3 +385,12 @@ res = pd.merge(left, right, on = ['key1', 'key2'])
    data['DayOfWeek'] = data.Date.dt.dayofweek
    data['WeekOfYear'] = data.Date.dt.weekofyear
    ```
+
+6. 图例中使用中文
+
+   ```python
+   plt.rcParams['fong.sans-serif']=['SimHei']
+   plt.rcParams['axes.unicode_minus']=False
+   ```
+
+   
